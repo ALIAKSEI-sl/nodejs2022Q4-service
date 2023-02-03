@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { InMemoryDb } from './in-memory.db';
+import { InMemoryDb } from './db.service.db';
 
 @Module({
   exports: [InMemoryDb],
