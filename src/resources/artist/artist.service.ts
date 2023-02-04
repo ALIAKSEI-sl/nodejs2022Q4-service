@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Injectable, Inject } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { InMemoryDb } from '../../db/db.service.db';
@@ -13,10 +13,11 @@ import { TrackService } from '../track/track.service';
 @Injectable()
 export class ArtistService {
   constructor(
-    private db: InMemoryDb,
-    private favoritesService: FavoritesService,
-    private albumService: AlbumService,
-    private trackService: TrackService,
+    private db: InMemoryDb, // it is ok
+    @Inject(forwardRef(() => FavoritesService))
+    private favoritesService: FavoritesService, // it isn't ok
+    @Inject(forwardRef(() => AlbumService)) private albumService: AlbumService, // it is ok
+    @Inject(forwardRef(() => TrackService)) private trackService: TrackService, // it isn't ok
   ) {}
   create(createArtistDto: CreateArtistDto): ArtistEntity {
     const artist = {
@@ -38,18 +39,11 @@ export class ArtistService {
     const artist = this.db.artists.find(
       ({ id: artistsId }) => artistsId === id,
     );
-    if (!artist) {
-      throw new HttpException(
-        ErrorMessages.nonExistentUser,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
     return artist;
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto): ArtistEntity {
-    const artistIndex = this.db.tracks.findIndex(
+    const artistIndex = this.db.artists.findIndex(
       ({ id: artistId }) => artistId === id,
     );
     if (artistIndex === -1) {
@@ -76,7 +70,8 @@ export class ArtistService {
 
     this.db.artists.splice(artistIndex, 1);
 
-    this.favoritesService.removeArtist(id);
+    const removeArtist = true;
+    this.favoritesService.removeArtist(id, removeArtist);
 
     this.albumService.removeArtistId(id);
     this.trackService.removeArtistId(id);

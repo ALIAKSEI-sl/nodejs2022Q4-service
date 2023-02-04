@@ -9,7 +9,9 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
+  HttpException,
 } from '@nestjs/common';
+import { ErrorMessages } from 'src/helpers/responseMessages';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
@@ -43,7 +45,14 @@ export class ArtistController {
     )
     id: string,
   ): ArtistEntity {
-    return this.artistService.findOne(id);
+    const artist = this.artistService.findOne(id);
+    if (!artist) {
+      throw new HttpException(
+        ErrorMessages.nonExistentUser,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return artist;
   }
 
   @Put(':id')

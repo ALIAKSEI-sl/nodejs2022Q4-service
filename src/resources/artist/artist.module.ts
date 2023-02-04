@@ -13,6 +13,7 @@ import { FavoritesModule } from '../favorites/favorites.module';
     forwardRef(() => TrackModule),
     forwardRef(() => AlbumModule),
   ],
+  exports: [ArtistService],
   controllers: [ArtistController],
   providers: [ArtistService],
 })
