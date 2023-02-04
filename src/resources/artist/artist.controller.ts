@@ -9,7 +9,6 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
-  HttpException,
 } from '@nestjs/common';
 import { createHttpException } from '../../helpers/createHttpException';
 import { ErrorMessages } from 'src/helpers/responseMessages';
