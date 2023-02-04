@@ -9,11 +9,13 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
+  HttpException,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackEntity } from './entities/track.entity';
+import { ErrorMessages } from 'src/helpers/responseMessages';
 
 @Controller('track')
 export class TrackController {
@@ -43,7 +45,15 @@ export class TrackController {
     )
     id: string,
   ): TrackEntity {
-    return this.trackService.findOne(id);
+    const track = this.trackService.findOne(id);
+    if (!track) {
+      throw new HttpException(
+        ErrorMessages.nonExistentTrack,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return track;
   }
 
   @Put(':id')

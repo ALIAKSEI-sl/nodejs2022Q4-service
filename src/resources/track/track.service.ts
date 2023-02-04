@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { InMemoryDb } from '../../db/db.service.db';
@@ -12,6 +12,7 @@ import { FavoritesService } from '../favorites/favorites.service';
 export class TrackService {
   constructor(
     private db: InMemoryDb,
+    @Inject(forwardRef(() => FavoritesService))
     private favoritesService: FavoritesService,
   ) {}
 
@@ -33,13 +34,6 @@ export class TrackService {
 
   findOne(id: string): TrackEntity {
     const track = this.db.tracks.find(({ id: trackId }) => trackId === id);
-    if (!track) {
-      throw new HttpException(
-        ErrorMessages.nonExistentTrack,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
     return track;
   }
 
@@ -72,7 +66,8 @@ export class TrackService {
 
     this.db.tracks.splice(trackIndex, 1);
 
-    this.favoritesService.removeTrack(id);
+    const removeTrack = true;
+    this.favoritesService.removeTrack(id, removeTrack);
   }
   removeArtistId(id: string) {
     const trackIndex = this.db.tracks.findIndex(
