@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Injectable, Inject } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { InMemoryDb } from '../../db/db.service.db';
@@ -13,7 +13,9 @@ import { TrackService } from '../track/track.service';
 export class AlbumService {
   constructor(
     private db: InMemoryDb,
+    @Inject(forwardRef(() => FavoritesService))
     private favoritesService: FavoritesService,
+    @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
   ) {}
 
@@ -35,13 +37,6 @@ export class AlbumService {
 
   findOne(id: string): AlbumEntity {
     const album = this.db.albums.find(({ id: albumId }) => albumId === id);
-    if (!album) {
-      throw new HttpException(
-        ErrorMessages.nonExistentUser,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
     return album;
   }
 
@@ -72,9 +67,10 @@ export class AlbumService {
       );
     }
 
-    this.db.users.splice(albumIndex, 1);
+    this.db.albums.splice(albumIndex, 1);
 
-    this.favoritesService.removeAlbum(id);
+    const removeAlbum = true;
+    this.favoritesService.removeAlbum(id, removeAlbum);
 
     this.trackService.removeAlbumId(id);
   }
