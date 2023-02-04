@@ -21,7 +21,7 @@ import { UserEntity } from './entities/user.entity';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseInterceptors(ClassSerializerInterceptor) //исключает id user из ответа
+  @UseInterceptors(ClassSerializerInterceptor) //исключает userId из ответа
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createUserDto: CreateUserDto): UserEntity {

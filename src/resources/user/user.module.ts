@@ -4,7 +4,7 @@ import { UserController } from './user.controller';
 import { DbModule } from '../../db/db.module';
 
 @Module({
-  imports: [DbModule],
+  imports: [DbModule], //импорт базы данных
   controllers: [UserController],
   providers: [UserService],
 })
