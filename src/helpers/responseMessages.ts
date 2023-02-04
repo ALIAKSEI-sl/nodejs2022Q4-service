@@ -1,15 +1,8 @@
 export const enum ErrorMessages {
-  nonExistentUser = "UserId doesn't exist",
+  nonExistentUser = "User doesn't exist",
   nonExistentTrack = "Track doesn't exist",
   nonExistentAlbum = "Album doesn't exist",
   nonExistentArtist = "Artist doesn't exist",
-  nonExistentEndpoint = 'Endpoint does not exist',
-  notUuid = "UserId isn't uuid",
-  serverError = 'Sorry, error on the server',
-  ok = 'successfully',
-  invalidJson = 'Invalid JSON request',
-  requiredFields = "Required fields are missing or don't match the type",
-  createdUser = 'A new record has been created',
   equalPasswords = 'The new password cannot equal the old password',
   incorrectPassword = 'Incorrect password entered',
 }
