@@ -4,7 +4,8 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import { InMemoryDb } from '../../db/db.service.db';
 import { v4 as uuidv4 } from 'uuid';
 import { TrackEntity } from './entities/track.entity';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { createHttpException } from '../../helpers/createHttpException';
+import { HttpStatus } from '@nestjs/common';
 import { ErrorMessages } from '../../helpers/responseMessages';
 import { FavoritesService } from '../favorites/favorites.service';
 
@@ -23,7 +24,6 @@ export class TrackService {
     };
 
     this.db.tracks.push(track);
-
     return track;
   }
 
@@ -42,14 +42,10 @@ export class TrackService {
       ({ id: trackId }) => trackId === id,
     );
     if (trackIndex === -1) {
-      throw new HttpException(
-        ErrorMessages.nonExistentTrack,
-        HttpStatus.NOT_FOUND,
-      );
+      createHttpException(ErrorMessages.nonExistentTrack, HttpStatus.NOT_FOUND);
     }
 
     const track = Object.assign(this.db.tracks[trackIndex], updateTrackDto);
-
     return track;
   }
 
@@ -58,10 +54,7 @@ export class TrackService {
       ({ id: trackId }) => trackId === id,
     );
     if (trackIndex === -1) {
-      throw new HttpException(
-        ErrorMessages.nonExistentTrack,
-        HttpStatus.NOT_FOUND,
-      );
+      createHttpException(ErrorMessages.nonExistentTrack, HttpStatus.NOT_FOUND);
     }
 
     this.db.tracks.splice(trackIndex, 1);
@@ -69,6 +62,7 @@ export class TrackService {
     const removeTrack = true;
     this.favoritesService.removeTrack(id, removeTrack);
   }
+
   removeArtistId(id: string) {
     const trackIndex = this.db.tracks.findIndex(
       (track) => track.artistId === id,
@@ -77,6 +71,7 @@ export class TrackService {
       this.db.tracks[trackIndex].artistId = null;
     }
   }
+
   removeAlbumId(id: string) {
     const trackIndex = this.db.tracks.findIndex(
       (track) => track.albumId === id,
