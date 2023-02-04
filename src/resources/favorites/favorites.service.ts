@@ -1,15 +1,10 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InMemoryDb } from '../../db/db.service.db';
 import { FavoritesEntity } from './entities/favorites.entity';
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
 import { TrackService } from '../track/track.service';
+import { createHttpException } from '../../helpers/createHttpException';
 import { ErrorMessages } from 'src/helpers/responseMessages';
 
 @Injectable()
@@ -26,6 +21,7 @@ export class FavoritesService {
 
   findAll(): FavoritesEntity {
     const { albums, artists, tracks } = this.db.favorites;
+
     const favorites = new FavoritesEntity();
     favorites.albums = [];
     favorites.artists = [];
@@ -51,14 +47,14 @@ export class FavoritesService {
 
   addTrack(id: string): { message: string } {
     const track = this.trackService.findOne(id);
-    if (!track) {
-      throw new HttpException(
+    if (track === undefined) {
+      createHttpException(
         ErrorMessages.nonExistentTrack,
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-    this.db.favorites.tracks.push(id);
 
+    this.db.favorites.tracks.push(id);
     return { message: 'Track added to favorites' };
   }
 
@@ -69,7 +65,7 @@ export class FavoritesService {
 
     if (trackIndex === -1) {
       if (!removeTrack) {
-        throw new HttpException(
+        createHttpException(
           ErrorMessages.nonExistentTrack,
           HttpStatus.NOT_FOUND,
         );
@@ -81,12 +77,13 @@ export class FavoritesService {
 
   addAlbum(id: string): { message: string } {
     const album = this.albumService.findOne(id);
-    if (!album) {
-      throw new HttpException(
+    if (album === undefined) {
+      createHttpException(
         ErrorMessages.nonExistentUser,
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
+
     this.db.favorites.albums.push(id);
     return { message: 'Album added to favorites' };
   }
@@ -97,7 +94,7 @@ export class FavoritesService {
     );
     if (albumIndex === -1) {
       if (!removeAlbum) {
-        throw new HttpException(
+        createHttpException(
           ErrorMessages.nonExistentAlbum,
           HttpStatus.NOT_FOUND,
         );
@@ -109,12 +106,13 @@ export class FavoritesService {
 
   addArtist(id: string): { message: string } {
     const artist = this.artistService.findOne(id);
-    if (!artist) {
-      throw new HttpException(
+    if (artist === undefined) {
+      createHttpException(
         ErrorMessages.nonExistentUser,
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
+
     this.db.favorites.artists.push(id);
     return { message: 'Artist added to favorites' };
   }
@@ -125,7 +123,7 @@ export class FavoritesService {
     );
     if (artistIndex === -1) {
       if (!removeArtist) {
-        throw new HttpException(
+        createHttpException(
           ErrorMessages.nonExistentArtist,
           HttpStatus.NOT_FOUND,
         );
