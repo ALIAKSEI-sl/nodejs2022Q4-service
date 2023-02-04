@@ -11,6 +11,7 @@ import {
   ParseUUIDPipe,
   HttpException,
 } from '@nestjs/common';
+import { createHttpException } from '../../helpers/createHttpException';
 import { ErrorMessages } from 'src/helpers/responseMessages';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -46,11 +47,8 @@ export class ArtistController {
     id: string,
   ): ArtistEntity {
     const artist = this.artistService.findOne(id);
-    if (!artist) {
-      throw new HttpException(
-        ErrorMessages.nonExistentUser,
-        HttpStatus.NOT_FOUND,
-      );
+    if (artist === undefined) {
+      createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
     }
     return artist;
   }

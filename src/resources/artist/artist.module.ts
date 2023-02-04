@@ -9,9 +9,9 @@ import { FavoritesModule } from '../favorites/favorites.module';
 @Module({
   imports: [
     DbModule,
-    forwardRef(() => FavoritesModule),
-    forwardRef(() => TrackModule),
     forwardRef(() => AlbumModule),
+    forwardRef(() => TrackModule),
+    forwardRef(() => FavoritesModule),
   ],
   exports: [ArtistService],
   controllers: [ArtistController],

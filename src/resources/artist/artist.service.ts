@@ -4,7 +4,8 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { InMemoryDb } from '../../db/db.service.db';
 import { ArtistEntity } from './entities/artist.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
+import { createHttpException } from '../../helpers/createHttpException';
 import { ErrorMessages } from '../../helpers/responseMessages';
 import { FavoritesService } from '../favorites/favorites.service';
 import { AlbumService } from '../album/album.service';
@@ -13,20 +14,20 @@ import { TrackService } from '../track/track.service';
 @Injectable()
 export class ArtistService {
   constructor(
-    private db: InMemoryDb, // it is ok
+    private db: InMemoryDb,
     @Inject(forwardRef(() => FavoritesService))
-    private favoritesService: FavoritesService, // it isn't ok
-    @Inject(forwardRef(() => AlbumService)) private albumService: AlbumService, // it is ok
-    @Inject(forwardRef(() => TrackService)) private trackService: TrackService, // it isn't ok
+    private favoritesService: FavoritesService,
+    @Inject(forwardRef(() => AlbumService)) private albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
   ) {}
+
   create(createArtistDto: CreateArtistDto): ArtistEntity {
     const artist = {
-      id: uuidv4(), // uuid v4
+      id: uuidv4(),
       ...createArtistDto,
     };
 
     this.db.artists.push(artist);
-
     return artist;
   }
 
@@ -47,7 +48,7 @@ export class ArtistService {
       ({ id: artistId }) => artistId === id,
     );
     if (artistIndex === -1) {
-      throw new HttpException(
+      createHttpException(
         ErrorMessages.nonExistentArtist,
         HttpStatus.NOT_FOUND,
       );
@@ -62,7 +63,7 @@ export class ArtistService {
       ({ id: artistId }) => artistId === id,
     );
     if (artistIndex === -1) {
-      throw new HttpException(
+      createHttpException(
         ErrorMessages.nonExistentArtist,
         HttpStatus.NOT_FOUND,
       );
