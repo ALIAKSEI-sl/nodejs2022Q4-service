@@ -3,11 +3,12 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { InMemoryDb } from '../../db/db.service.db';
 import { AlbumEntity } from './entities/album.entity';
-import { v4 as uuidv4 } from 'uuid';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
+import { createHttpException } from '../../helpers/createHttpException';
 import { ErrorMessages } from '../../helpers/responseMessages';
 import { FavoritesService } from '../favorites/favorites.service';
 import { TrackService } from '../track/track.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AlbumService {
@@ -21,12 +22,11 @@ export class AlbumService {
 
   create(createAlbumDto: CreateAlbumDto): AlbumEntity {
     const album = {
-      id: uuidv4(), // uuid v4
+      id: uuidv4(),
       ...createAlbumDto,
     };
 
     this.db.albums.push(album);
-
     return album;
   }
 
@@ -45,14 +45,10 @@ export class AlbumService {
       ({ id: albumId }) => albumId === id,
     );
     if (albumIndex === -1) {
-      throw new HttpException(
-        ErrorMessages.nonExistentAlbum,
-        HttpStatus.NOT_FOUND,
-      );
+      createHttpException(ErrorMessages.nonExistentAlbum, HttpStatus.NOT_FOUND);
     }
 
     const album = Object.assign(this.db.albums[albumIndex], updateAlbumDto);
-
     return album;
   }
 
@@ -61,10 +57,7 @@ export class AlbumService {
       ({ id: albumId }) => albumId === id,
     );
     if (albumIndex === -1) {
-      throw new HttpException(
-        ErrorMessages.nonExistentAlbum,
-        HttpStatus.NOT_FOUND,
-      );
+      createHttpException(ErrorMessages.nonExistentAlbum, HttpStatus.NOT_FOUND);
     }
 
     this.db.albums.splice(albumIndex, 1);

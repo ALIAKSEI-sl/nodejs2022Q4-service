@@ -9,8 +9,8 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
-  HttpException,
 } from '@nestjs/common';
+import { createHttpException } from '../../helpers/createHttpException';
 import { ErrorMessages } from 'src/helpers/responseMessages';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -46,11 +46,8 @@ export class AlbumController {
     id: string,
   ): AlbumEntity {
     const album = this.albumService.findOne(id);
-    if (!album) {
-      throw new HttpException(
-        ErrorMessages.nonExistentUser,
-        HttpStatus.NOT_FOUND,
-      );
+    if (album === undefined) {
+      createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
     }
     return album;
   }

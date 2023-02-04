@@ -8,10 +8,10 @@ import { TrackModule } from '../track/track.module';
 @Module({
   imports: [
     DbModule,
-    forwardRef(() => FavoritesModule),
     forwardRef(() => TrackModule),
+    forwardRef(() => FavoritesModule),
   ],
-  exports: [AlbumService],
+  exports: [AlbumService], // экспорт album service
   controllers: [AlbumController],
   providers: [AlbumService],
 })
