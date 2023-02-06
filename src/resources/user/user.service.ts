@@ -32,25 +32,21 @@ export class UserService {
     return users;
   }
 
-  findOne(id: string): UserEntity {
+  findOne(id: string): UserEntity | undefined {
     const user = this.db.users.find(({ id: userId }) => userId === id);
-    if (user === undefined) {
-      createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
-    }
-
     return user;
   }
 
-  update(id: string, updatePasswordDto: UpdatePasswordDto): UserEntity {
+  update(
+    id: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): UserEntity | undefined {
     const userIndex = this.db.users.findIndex(
       ({ id: userId }) => userId === id,
     );
-    if (userIndex === -1) {
-      createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
-    }
+    if (userIndex === -1) return undefined;
 
     const user = this.db.users[userIndex];
-
     if (user.password === updatePasswordDto.newPassword) {
       createHttpException(ErrorMessages.equalPasswords, HttpStatus.FORBIDDEN);
     } else if (user.password !== updatePasswordDto.oldPassword) {

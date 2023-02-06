@@ -16,6 +16,8 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserEntity } from './entities/user.entity';
+import { createHttpException } from 'src/helpers/createHttpException';
+import { ErrorMessages } from 'src/helpers/responseMessages';
 
 @Controller('user')
 export class UserController {
@@ -48,7 +50,12 @@ export class UserController {
     )
     id: string,
   ): UserEntity {
-    return this.userService.findOne(id);
+    const user = this.userService.findOne(id);
+    console.log(user);
+    if (user === undefined) {
+      createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -63,9 +70,13 @@ export class UserController {
       }),
     )
     id: string,
-    @Body() updateUserDto: UpdatePasswordDto,
+    @Body() updatePasswordDto: UpdatePasswordDto,
   ): UserEntity {
-    return this.userService.update(id, updateUserDto);
+    const user = this.userService.update(id, updatePasswordDto);
+    if (user === undefined) {
+      createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
