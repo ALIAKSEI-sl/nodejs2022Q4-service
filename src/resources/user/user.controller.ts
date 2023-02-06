@@ -51,7 +51,6 @@ export class UserController {
     id: string,
   ): UserEntity {
     const user = this.userService.findOne(id);
-    console.log(user);
     if (user === undefined) {
       createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
     }
