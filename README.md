@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/ALIAKSEI-sl/nodejs2022Q4-service.git
 ```
 
 ## Installing NPM modules
@@ -16,6 +16,10 @@ git clone {repository URL}
 ```
 npm install
 ```
+
+## Using .env
+
+Rename file `.env.example` to `.env` and enter the number of port.
 
 ## Running application
 
@@ -70,3 +74,23 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+### Usage Docker
+
+Run Docker Desktop
+
+```
+npm run docker
+```
+
+Docker testing
+
+```
+npm run docker:test
+```
+
+### Scan Docker
+
+```
+npm run scan
+```
