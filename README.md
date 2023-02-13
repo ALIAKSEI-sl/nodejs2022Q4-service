@@ -83,6 +83,12 @@ Run Docker Desktop
 npm run docker
 ```
 
+Docker testing
+
+```
+npm run docker:test
+```
+
 ### Scan Docker
 
 ```
