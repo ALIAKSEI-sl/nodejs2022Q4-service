@@ -23,19 +23,21 @@ export class ArtistController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createArtistDto: CreateArtistDto): ArtistEntity {
-    return this.artistService.create(createArtistDto);
+  async create(
+    @Body() createArtistDto: CreateArtistDto,
+  ): Promise<ArtistEntity> {
+    return await this.artistService.create(createArtistDto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll(): ArtistEntity[] {
-    return this.artistService.findAll();
+  async findAll(): Promise<ArtistEntity[]> {
+    return await this.artistService.findAll();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(
+  async findOne(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -44,9 +46,9 @@ export class ArtistController {
       }),
     )
     id: string,
-  ): ArtistEntity {
-    const artist = this.artistService.findOne(id);
-    if (artist === undefined) {
+  ): Promise<ArtistEntity> {
+    const artist = await this.artistService.findOne(id);
+    if (artist === null) {
       createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
     }
     return artist;
@@ -54,7 +56,7 @@ export class ArtistController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
-  update(
+  async update(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -64,13 +66,13 @@ export class ArtistController {
     )
     id: string,
     @Body() updateArtistDto: UpdateArtistDto,
-  ): ArtistEntity {
-    return this.artistService.update(id, updateArtistDto);
+  ): Promise<ArtistEntity> {
+    return await this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
+  async remove(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -79,7 +81,7 @@ export class ArtistController {
       }),
     )
     id: string,
-  ): void {
-    this.artistService.remove(id);
+  ): Promise<void> {
+    await this.artistService.remove(id);
   }
 }
