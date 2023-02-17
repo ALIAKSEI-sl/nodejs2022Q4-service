@@ -5,6 +5,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { readFile } from 'fs/promises';
 import { join } from 'node:path';
 import { parse } from 'yaml';
+import 'reflect-metadata';
 import 'dotenv/config';
 
 const PORT = process.env.PORT || 4000;
