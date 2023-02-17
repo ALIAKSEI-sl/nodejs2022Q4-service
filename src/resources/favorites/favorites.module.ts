@@ -1,14 +1,15 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { FavoritesController } from './favorites.controller';
-import { DbModule } from 'src/db/db.module';
 import { ArtistModule } from '../artist/artist.module';
 import { AlbumModule } from '../album/album.module';
 import { TrackModule } from '../track/track.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { FavoritesEntity } from './entities/favorites.entity';
 
 @Module({
   imports: [
-    DbModule,
+    TypeOrmModule.forFeature([FavoritesEntity]),
     forwardRef(() => ArtistModule), //forwardRef устраняет циклические зависимости между модулями
     forwardRef(() => AlbumModule),
     forwardRef(() => TrackModule),
