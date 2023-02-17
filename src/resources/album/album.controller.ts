@@ -23,19 +23,19 @@ export class AlbumController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createAlbumDto: CreateAlbumDto): AlbumEntity {
-    return this.albumService.create(createAlbumDto);
+  async create(@Body() createAlbumDto: CreateAlbumDto): Promise<AlbumEntity> {
+    return await this.albumService.create(createAlbumDto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll(): AlbumEntity[] {
-    return this.albumService.findAll();
+  async findAll(): Promise<AlbumEntity[]> {
+    return await this.albumService.findAll();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(
+  async findOne(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -44,9 +44,9 @@ export class AlbumController {
       }),
     )
     id: string,
-  ): AlbumEntity {
-    const album = this.albumService.findOne(id);
-    if (album === undefined) {
+  ): Promise<AlbumEntity> {
+    const album = await this.albumService.findOne(id);
+    if (album === null) {
       createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
     }
     return album;
@@ -54,7 +54,7 @@ export class AlbumController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
-  update(
+  async update(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -64,13 +64,13 @@ export class AlbumController {
     )
     id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
-  ): AlbumEntity {
-    return this.albumService.update(id, updateAlbumDto);
+  ): Promise<AlbumEntity> {
+    return await this.albumService.update(id, updateAlbumDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
+  async remove(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -79,7 +79,7 @@ export class AlbumController {
       }),
     )
     id: string,
-  ): void {
-    return this.albumService.remove(id);
+  ): Promise<void> {
+    return await this.albumService.remove(id);
   }
 }
