@@ -12,6 +12,7 @@ import { LoggerModule } from './logger/logger.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { HttpExceptionFilter } from './logger/http-exception.filter';
 import { APP_FILTER } from '@nestjs/core';
+import { AuthModule } from './resources/auth/auth.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { APP_FILTER } from '@nestjs/core';
     AlbumModule,
     FavoritesModule,
     LoggerModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
