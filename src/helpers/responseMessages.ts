@@ -6,4 +6,7 @@ export const enum ErrorMessages {
   equalPasswords = 'The new password cannot equal the old password',
   incorrectPassword = 'Incorrect password entered',
   userAlreadyExists = 'User with this login already exists',
+  nonValidate = "no user with such login or password doesn't match actual one",
+  noRefreshToken = 'no refreshToken in body',
+  invalidRefreshToken = 'Refresh token is invalid or expired',
 }
