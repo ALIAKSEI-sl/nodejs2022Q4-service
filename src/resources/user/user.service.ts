@@ -7,6 +7,8 @@ import { createHttpException } from '../../helpers/createHttpException';
 import { ErrorMessages } from '../../helpers/responseMessages';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import 'dotenv/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -25,6 +27,10 @@ export class UserService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    const { password } = createUserDto;
+    const saltRounds = parseInt(process.env.CRYPT_SALT_ROUNDS);
+    createUserDto.password = await bcrypt.hash(password, saltRounds);
+
     const user = new UserEntity(createUserDto.login, createUserDto.password);
 
     const createdUser = this.userRepository.create(user);
@@ -42,6 +48,11 @@ export class UserService {
     return user;
   }
 
+  async findOneByLogin(login: string): Promise<UserEntity> | null {
+    const user = await this.userRepository.findOne({ where: { login } });
+    return user;
+  }
+
   async update(
     id: string,
     updatePasswordDto: UpdatePasswordDto,
@@ -49,16 +60,31 @@ export class UserService {
     const user = await this.userRepository.findOne({ where: { id } });
     if (user === null) return null;
 
-    if (user.password === updatePasswordDto.newPassword) {
+    const verificationNewPassword = await bcrypt.compare(
+      updatePasswordDto.newPassword,
+      user.password,
+    );
+    if (verificationNewPassword) {
       createHttpException(ErrorMessages.equalPasswords, HttpStatus.FORBIDDEN);
-    } else if (user.password !== updatePasswordDto.oldPassword) {
+    }
+
+    const verificationOldPassword = await bcrypt.compare(
+      updatePasswordDto.oldPassword,
+      user.password,
+    );
+    if (!verificationOldPassword) {
       createHttpException(
         ErrorMessages.incorrectPassword,
         HttpStatus.FORBIDDEN,
       );
     }
 
-    user.password = updatePasswordDto.newPassword;
+    const saltRounds = parseInt(process.env.CRYPT_SALT_ROUNDS);
+    user.password = await bcrypt.hash(
+      updatePasswordDto.newPassword,
+      saltRounds,
+    );
+
     const savedUser = await this.userRepository.save(user);
     return savedUser;
   }
