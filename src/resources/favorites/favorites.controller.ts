@@ -9,7 +9,6 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
-import { FavoritesResponse } from './model/favorites.model';
 
 @Controller('favs/')
 export class FavoritesController {
@@ -17,7 +16,7 @@ export class FavoritesController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async findAll(): Promise<FavoritesResponse> {
+  async findAll() {
     return await this.favoritesService.findAll();
   }
 
