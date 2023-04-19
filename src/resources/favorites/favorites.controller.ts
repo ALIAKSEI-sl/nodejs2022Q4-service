@@ -9,7 +9,7 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
-import { FavoritesEntity } from './entities/favorites.entity';
+import { FavoritesResponse } from './model/favorites.model';
 
 @Controller('favs/')
 export class FavoritesController {
@@ -17,13 +17,13 @@ export class FavoritesController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll(): FavoritesEntity {
-    return this.favoritesService.findAll();
+  async findAll(): Promise<FavoritesResponse> {
+    return await this.favoritesService.findAll();
   }
 
   @Post('track/:id')
   @HttpCode(HttpStatus.CREATED)
-  addTrack(
+  async addTrack(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -33,12 +33,12 @@ export class FavoritesController {
     )
     id: string,
   ) {
-    return this.favoritesService.addTrack(id);
+    return await this.favoritesService.addTrack(id);
   }
 
   @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeTrack(
+  async removeTrack(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -47,13 +47,13 @@ export class FavoritesController {
       }),
     )
     id: string,
-  ): void {
-    this.favoritesService.removeTrack(id);
+  ): Promise<void> {
+    await this.favoritesService.removeTrack(id);
   }
 
   @Post('album/:id')
   @HttpCode(HttpStatus.CREATED)
-  addAlbum(
+  async addAlbum(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -63,12 +63,12 @@ export class FavoritesController {
     )
     id: string,
   ) {
-    return this.favoritesService.addAlbum(id);
+    return await this.favoritesService.addAlbum(id);
   }
 
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeAlbum(
+  async removeAlbum(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -77,13 +77,13 @@ export class FavoritesController {
       }),
     )
     id: string,
-  ): void {
-    this.favoritesService.removeAlbum(id);
+  ): Promise<void> {
+    await this.favoritesService.removeAlbum(id);
   }
 
   @Post('artist/:id')
   @HttpCode(HttpStatus.CREATED)
-  addArtist(
+  async addArtist(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -93,12 +93,12 @@ export class FavoritesController {
     )
     id: string,
   ) {
-    return this.favoritesService.addArtist(id);
+    return await this.favoritesService.addArtist(id);
   }
 
   @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeArtist(
+  async removeArtist(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -107,7 +107,7 @@ export class FavoritesController {
       }),
     )
     id: string,
-  ): void {
-    this.favoritesService.removeArtist(id);
+  ): Promise<void> {
+    await this.favoritesService.removeArtist(id);
   }
 }

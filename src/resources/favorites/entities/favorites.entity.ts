@@ -1,9 +1,16 @@
-import { AlbumEntity } from 'src/resources/album/entities/album.entity';
-import { ArtistEntity } from 'src/resources/artist/entities/artist.entity';
-import { TrackEntity } from 'src/resources/track/entities/track.entity';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
+@Entity('favorites')
 export class FavoritesEntity {
-  artists: ArtistEntity[];
-  albums: AlbumEntity[];
-  tracks: TrackEntity[];
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column('text', { array: true })
+  artists: string[];
+
+  @Column('text', { array: true })
+  albums: string[];
+
+  @Column('text', { array: true })
+  tracks: string[];
 }

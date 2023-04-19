@@ -23,24 +23,24 @@ import { ErrorMessages } from 'src/helpers/responseMessages';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseInterceptors(ClassSerializerInterceptor) //исключает userId из ответа
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createUserDto: CreateUserDto): UserEntity {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+    return await this.userService.create(createUserDto);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll(): UserEntity[] {
-    return this.userService.findAll();
+  async findAll(): Promise<UserEntity[]> {
+    return await this.userService.findAll();
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(
+  async findOne(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -49,9 +49,9 @@ export class UserController {
       }),
     )
     id: string,
-  ): UserEntity {
-    const user = this.userService.findOne(id);
-    if (user === undefined) {
+  ): Promise<UserEntity> {
+    const user = await this.userService.findOne(id);
+    if (user === null) {
       createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
     }
     return user;
@@ -60,7 +60,7 @@ export class UserController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   @HttpCode(HttpStatus.OK)
-  update(
+  async update(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -70,9 +70,9 @@ export class UserController {
     )
     id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
-  ): UserEntity {
-    const user = this.userService.update(id, updatePasswordDto);
-    if (user === undefined) {
+  ): Promise<UserEntity> {
+    const user = await this.userService.update(id, updatePasswordDto);
+    if (user === null) {
       createHttpException(ErrorMessages.nonExistentUser, HttpStatus.NOT_FOUND);
     }
     return user;
@@ -81,7 +81,7 @@ export class UserController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
+  async remove(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -90,7 +90,7 @@ export class UserController {
       }),
     )
     id: string,
-  ): void {
-    this.userService.remove(id);
+  ): Promise<void> {
+    await this.userService.remove(id);
   }
 }

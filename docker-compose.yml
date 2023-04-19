@@ -1,12 +1,11 @@
 version: '3.9'
 services:
   service_node_js:
-    image: server_node_js
+    image: aliaksei69/server_node_js:0.0.2
     container_name: server_node_js
     build:
         context: .
         dockerfile: Dockerfile
-    command: npm run start:dev
     restart: always
     depends_on:
       - data_base_postgres
@@ -19,14 +18,13 @@ services:
       - ${PORT}:${PORT}
     environment:
       - PORT = ${PORT}
-      - DATABASE_URL = postgresql://
-
   data_base_postgres:
-    image: data_base_postgres
+    image: aliaksei69/data_base_postgres:0.0.1
     container_name: data_base_postgres
     build:
       dockerfile: ./dataBase/Dockerfile
       context: .
+    command: postgres -c logging_collector=on
     volumes:
       - postgres_data_base:/var/lib/postgresql/data
       - postgres_logs:/var/log/postgresql/postgresql.log

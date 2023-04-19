@@ -5,4 +5,5 @@ export const enum ErrorMessages {
   nonExistentArtist = "Artist doesn't exist",
   equalPasswords = 'The new password cannot equal the old password',
   incorrectPassword = 'Incorrect password entered',
+  userAlreadyExists = 'User with this login already exists',
 }

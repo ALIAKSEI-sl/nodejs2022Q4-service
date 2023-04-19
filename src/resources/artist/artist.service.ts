@@ -1,80 +1,67 @@
 import { forwardRef, Injectable, Inject } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { InMemoryDb } from '../../db/db.service.db';
 import { ArtistEntity } from './entities/artist.entity';
-import { v4 as uuidv4 } from 'uuid';
 import { HttpStatus } from '@nestjs/common';
 import { createHttpException } from '../../helpers/createHttpException';
 import { ErrorMessages } from '../../helpers/responseMessages';
 import { FavoritesService } from '../favorites/favorites.service';
 import { AlbumService } from '../album/album.service';
 import { TrackService } from '../track/track.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ArtistService {
   constructor(
-    private db: InMemoryDb,
+    @InjectRepository(ArtistEntity)
+    private albumRepository: Repository<ArtistEntity>,
     @Inject(forwardRef(() => FavoritesService))
     private favoritesService: FavoritesService,
     @Inject(forwardRef(() => AlbumService)) private albumService: AlbumService,
     @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
   ) {}
 
-  create(createArtistDto: CreateArtistDto): ArtistEntity {
-    const artist = {
-      id: uuidv4(),
-      ...createArtistDto,
-    };
-
-    this.db.artists.push(artist);
-    return artist;
+  async create(createArtistDto: CreateArtistDto): Promise<ArtistEntity> {
+    const artist = this.albumRepository.create(createArtistDto);
+    const savedArtist = await this.albumRepository.save(artist);
+    return savedArtist;
   }
 
-  findAll(): ArtistEntity[] {
-    const artists = this.db.artists;
+  async findAll(): Promise<ArtistEntity[]> {
+    const artists = await this.albumRepository.find();
     return artists;
   }
 
-  findOne(id: string): ArtistEntity {
-    const artist = this.db.artists.find(
-      ({ id: artistsId }) => artistsId === id,
-    );
+  async findOne(id: string): Promise<ArtistEntity> | null {
+    const artist = await this.albumRepository.findOne({ where: { id } });
     return artist;
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto): ArtistEntity {
-    const artistIndex = this.db.artists.findIndex(
-      ({ id: artistId }) => artistId === id,
-    );
-    if (artistIndex === -1) {
+  async update(
+    id: string,
+    updateArtistDto: UpdateArtistDto,
+  ): Promise<ArtistEntity> {
+    const artist = await this.albumRepository.findOne({ where: { id } });
+    if (artist === null) {
       createHttpException(
         ErrorMessages.nonExistentArtist,
         HttpStatus.NOT_FOUND,
       );
     }
 
-    const artist = Object.assign(this.db.artists[artistIndex], updateArtistDto);
-    return artist;
+    const updatedArtist = Object.assign(artist, updateArtistDto);
+    const savedArtist = await this.albumRepository.save(updatedArtist);
+    return savedArtist;
   }
 
-  remove(id: string): void {
-    const artistIndex = this.db.artists.findIndex(
-      ({ id: artistId }) => artistId === id,
-    );
-    if (artistIndex === -1) {
+  async remove(id: string): Promise<void> {
+    const deletedArtist = await this.albumRepository.delete(id);
+    if (deletedArtist.affected === 0) {
       createHttpException(
         ErrorMessages.nonExistentArtist,
         HttpStatus.NOT_FOUND,
       );
     }
-
-    this.db.artists.splice(artistIndex, 1);
-
-    const removeArtist = true;
-    this.favoritesService.removeArtist(id, removeArtist);
-
-    this.albumService.removeArtistId(id);
-    this.trackService.removeArtistId(id);
   }
 }
