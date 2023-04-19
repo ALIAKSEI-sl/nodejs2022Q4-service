@@ -4,7 +4,7 @@ import { AlbumEntity } from './resources/album/entities/album.entity';
 import { ArtistEntity } from './resources/artist/entities/artist.entity';
 import { TrackEntity } from './resources/track/entities/track.entity';
 import { FavoritesEntity } from './resources/favorites/entities/favorites.entity';
-import { homeLibrary1676643029482 } from './migration/1676643029482-homeLibrary';
+import { homeLibraryServer1677507773810 } from './migration/1677507773810-homeLibraryServer';
 import 'dotenv/config';
 
 export const AppDataSource = new DataSource({
@@ -24,5 +24,5 @@ export const AppDataSource = new DataSource({
     FavoritesEntity,
   ],
   subscribers: [],
-  migrations: [homeLibrary1676643029482],
+  migrations: [homeLibraryServer1677507773810],
 });

@@ -7,7 +7,6 @@ import { createHttpException } from '../../helpers/createHttpException';
 import { ErrorMessages } from '../../helpers/responseMessages';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FavoritesResponse } from './model/favorites.model';
 
 @Injectable()
 export class FavoritesService {
@@ -23,50 +22,32 @@ export class FavoritesService {
   ) {}
 
   async getFavoritesRepository() {
-    const repository = await this.favoritesRepository.find();
+    const findOneOptions = {
+      relations: {
+        albums: true,
+        artists: true,
+        tracks: true,
+      },
+    };
+    const repository = await this.favoritesRepository.find(findOneOptions);
+
     if (repository.length === 0) {
       const createdFavorites = this.favoritesRepository.create();
-      createdFavorites.albums = [];
-      createdFavorites.artists = [];
-      createdFavorites.tracks = [];
+      await this.favoritesRepository.save(createdFavorites);
 
-      const savedFavorites = await this.favoritesRepository.save(
-        createdFavorites,
+      const repositoryFavorites = await this.favoritesRepository.find(
+        findOneOptions,
       );
-      return savedFavorites;
+      return repositoryFavorites[0];
     } else {
       return repository[0];
     }
   }
 
-  async findAll(): Promise<FavoritesResponse> {
-    const { albums, artists, tracks } = await this.getFavoritesRepository();
+  async findAll() {
+    const repositoryFavorites = await this.getFavoritesRepository();
 
-    const favoritesAlbums = (
-      await Promise.all(
-        albums.map(async (id) => await this.albumService.findOne(id)),
-      )
-    ).filter((album) => album);
-
-    const favoritesArtists = (
-      await Promise.all(
-        artists.map(async (id) => await this.artistService.findOne(id)),
-      )
-    ).filter((artist) => artist);
-
-    const favoritesTracks = (
-      await Promise.all(
-        tracks.map(async (id) => await this.trackService.findOne(id)),
-      )
-    ).filter((track) => track);
-
-    const favorites: FavoritesResponse = {
-      albums: favoritesAlbums,
-      artists: favoritesArtists,
-      tracks: favoritesTracks,
-    };
-
-    return favorites;
+    return repositoryFavorites;
   }
 
   async addTrack(id: string): Promise<{ message: string }> {
@@ -79,16 +60,16 @@ export class FavoritesService {
     }
 
     const repository = await this.getFavoritesRepository();
-    repository.tracks.push(id);
+    repository.tracks.push(track);
     await this.favoritesRepository.save(repository);
     return { message: 'Track added to favorites' };
   }
 
   async removeTrack(id: string, removeTrack = false): Promise<void> {
     const repository = await this.getFavoritesRepository();
-    const trackIndex = repository.tracks.findIndex((trackId) => trackId === id);
+    const trackIndex = repository.tracks.find((track) => track.id === id);
 
-    if (trackIndex === -1) {
+    if (trackIndex === undefined) {
       if (!removeTrack) {
         createHttpException(
           ErrorMessages.nonExistentTrack,
@@ -96,7 +77,7 @@ export class FavoritesService {
         );
       }
     } else {
-      repository.tracks.splice(trackIndex, 1);
+      repository.tracks = repository.tracks.filter((track) => track.id !== id);
       await this.favoritesRepository.save(repository);
     }
   }
@@ -111,15 +92,15 @@ export class FavoritesService {
     }
 
     const repository = await this.getFavoritesRepository();
-    repository.albums.push(id);
+    repository.albums.push(album);
     await this.favoritesRepository.save(repository);
     return { message: 'Album added to favorites' };
   }
 
   async removeAlbum(id: string, removeAlbum = false): Promise<void> {
     const repository = await this.getFavoritesRepository();
-    const albumIndex = repository.albums.findIndex((albumId) => albumId === id);
-    if (albumIndex === -1) {
+    const album = repository.albums.find((album) => album.id === id);
+    if (album === undefined) {
       if (!removeAlbum) {
         createHttpException(
           ErrorMessages.nonExistentAlbum,
@@ -127,7 +108,7 @@ export class FavoritesService {
         );
       }
     } else {
-      repository.albums.splice(albumIndex, 1);
+      repository.albums = repository.albums.filter((album) => album.id !== id);
       await this.favoritesRepository.save(repository);
     }
   }
@@ -142,17 +123,15 @@ export class FavoritesService {
     }
 
     const repository = await this.getFavoritesRepository();
-    repository.artists.push(id);
+    repository.artists.push(artist);
     await this.favoritesRepository.save(repository);
     return { message: 'Artist added to favorites' };
   }
 
   async removeArtist(id: string, removeArtist = false): Promise<void> {
     const repository = await this.getFavoritesRepository();
-    const artistIndex = repository.artists.findIndex(
-      (artistId) => artistId === id,
-    );
-    if (artistIndex === -1) {
+    const artist = repository.artists.find((artist) => artist.id === id);
+    if (artist === undefined) {
       if (!removeArtist) {
         createHttpException(
           ErrorMessages.nonExistentArtist,
@@ -160,7 +139,9 @@ export class FavoritesService {
         );
       }
     } else {
-      repository.artists.splice(artistIndex, 1);
+      repository.artists = repository.artists.filter(
+        (artist) => artist.id !== id,
+      );
       await this.favoritesRepository.save(repository);
     }
   }
